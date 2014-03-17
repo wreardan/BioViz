@@ -11,6 +11,6 @@ Alignment
 </ul>
 Alignment TODO:
 <ul>
-	<li>Back pointers<li>
+	<li>Back pointers</li>
 	<li>Formulas</li>
 </ul>
