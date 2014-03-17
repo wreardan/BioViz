@@ -2,7 +2,7 @@ from kivy.uix.listview import ListView
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
-from alignment import Alignment
+from algorithms.alignment import Alignment
 
 class MainView(GridLayout):
 

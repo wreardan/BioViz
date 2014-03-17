@@ -24,7 +24,7 @@ class Alignment:
 		self.matrix = [[None for _ in range(self.width)] for _ in range(self.height)]
 
 		self.local_align = False
-		
+
 	def set_parameters(self, match, mismatch, gap_penalty):
 		"set the scoring parameters"
 		self.match = match
@@ -52,7 +52,7 @@ class Alignment:
 					table[y + 1][x + 1].text = "N/A"
 
 	def step_initialize(self):
-		"The algoirthm's initialization step"
+		"The algorithm's initialization step"
 		if self.row == 0 and self.col == 0:
 			self.matrix[0][0] = 0
 			self.col += 1
