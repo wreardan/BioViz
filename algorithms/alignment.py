@@ -1,7 +1,7 @@
 class AlignmentNode:
 	def __init__(self, score=0):
-		this.score = score
-		this.backpointers = []
+		self.score = score
+		self.backpointers = (0,0)
 
 class Alignment:
 	"A class to execute the Needleman-Wunsch Algorithm"
@@ -24,6 +24,8 @@ class Alignment:
 		self.matrix = [[None for _ in range(self.width)] for _ in range(self.height)]
 
 		self.local_align = False
+
+		self.backpointers = { }
 
 	def set_parameters(self, match, mismatch, gap_penalty):
 		"set the scoring parameters"
@@ -53,21 +55,27 @@ class Alignment:
 
 	def step_initialize(self):
 		"The algorithm's initialization step"
-		if self.row == 0 and self.col == 0:
-			self.matrix[0][0] = 0
-			self.col += 1
-		elif self.col < self.width:
-			if self.local_align:
-				self.matrix[0][self.col] = 0
-			else:
-				self.matrix[0][self.col] = self.gap_penalty * self.col
-			self.col += 1
+		if self.row == 0:
+			if self.col == 0:
+				self.matrix[0][0] = 0
+				self.col += 1
+			else: # self.col < self.width:
+				if self.local_align:
+					self.matrix[0][self.col] = 0
+				else:
+					self.matrix[0][self.col] = self.gap_penalty * self.col
+				self.backpointers[(self.row, self.col)] = (self.row, self.col - 1)
+				self.col += 1
+				if self.col >= self.width:
+					self.row += 1
 		else:
-			index = self.row + 1
+			index = self.row
+			self.col = 0
 			if self.local_align:
 				self.matrix[index][0] = 0
 			else:
 				self.matrix[index][0] = self.gap_penalty * index
+			self.backpointers[(self.row, self.col)] = (self.row - 1, self.col)
 			if index > self.height - 2:
 				self.next_stage()
 				return
@@ -88,7 +96,23 @@ class Alignment:
 		if self.local_align:
 			scores.append(0)
 
-		self.matrix[self.row][self.col] = max(scores)
+		#max(scores) while storing the correct backpointers
+		best_score = -1000000
+		if (self.local_align) and (0 > max(scores)):
+			best_score = 0
+			#no backpointer if max is zero (local alignment only)
+		elif (match_score >= up_score) and (match_score >= left_score):
+			best_score = match_score
+			self.backpointers[(self.row, self.col)] = (self.row - 1, self.col - 1)
+		elif left_score > up_score:
+			best_score = left_score
+			self.backpointers[(self.row, self.col)] = (self.row, self.col - 1)
+		else:	#up_score is best or equal to left_score
+			best_score = up_score
+			self.backpointers[(self.row, self.col)] = (self.row - 1, self.col)
+
+
+		self.matrix[self.row][self.col] = best_score
 
 		self.col += 1
 		if(self.col >= self.width):
